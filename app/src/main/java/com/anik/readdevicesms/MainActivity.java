@@ -90,9 +90,20 @@ public class MainActivity extends AppCompatActivity {
             if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
             arrayAdapter.clear();
             do {
-                String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                        "\n" + smsInboxCursor.getString(indexBody) + "\n";
-                arrayAdapter.add(str);
+                String number=smsInboxCursor.getString(indexAddress);
+
+                /*
+                1. Check specific number is matched or not
+
+                2. If need to show all sms removed condition
+                 */
+                if(number.equals("8383")) {
+
+                    String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
+                            "\n" + smsInboxCursor.getString(indexBody) + "\n";
+                    arrayAdapter.add(str);
+                }
+
             } while (smsInboxCursor.moveToNext());
         }
 
