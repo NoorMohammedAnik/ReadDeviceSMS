@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.anik.readdevicesms.MainActivity"
+    tools:context="com.anik.readdevicesms.BankSMSActivity"
     android:padding="10dp">
 
     <!--   ListVivew    -->
 
     <ListView
-        android:id="@+id/SMSList"
+        android:id="@+id/SMSList2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"

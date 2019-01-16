@@ -8,13 +8,19 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> smsMessagesList = new ArrayList<String>();
         ListView smsListView;
         ArrayAdapter arrayAdapter;
+
+        Button btnRetrieveData;
 
         public static MainActivity instance() {
             return inst;
@@ -43,6 +51,15 @@ public class MainActivity extends AppCompatActivity {
             arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, smsMessagesList);
             smsListView.setAdapter(arrayAdapter);
 
+            btnRetrieveData=findViewById(R.id.btn_data);
+
+            btnRetrieveData.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    refreshSmsInboxFull();
+                }
+            });
 
             // Add SMS Read Permision At Runtime
             // Todo : If Permission Is Not GRANTED
@@ -87,10 +104,17 @@ public class MainActivity extends AppCompatActivity {
             Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
             int indexBody = smsInboxCursor.getColumnIndex("body");
             int indexAddress = smsInboxCursor.getColumnIndex("address");
+            int date = smsInboxCursor.getColumnIndex("date");
             if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
             arrayAdapter.clear();
             do {
                 String number=smsInboxCursor.getString(indexAddress);
+                String getDate=millisToDate(date);
+
+//                String FormattedDate;
+//
+//                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy",Locale.US);
+//                FormattedDate = sdf.format(getDate);
 
                 /*
                 1. Check specific number is matched or not
@@ -99,13 +123,81 @@ public class MainActivity extends AppCompatActivity {
                  */
                 if(number.equals("8383")) {
 
-                    String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                            "\n" + smsInboxCursor.getString(indexBody) + "\n";
-                    arrayAdapter.add(str);
+                    String info =smsInboxCursor.getString(indexBody);
+                    Log.d("SMS",info);
+
+
+//                    String value2[]=info.split(" ")[2].split("to");
+//                   // System.out.println(value2[0]);
+//                    //System.out.println(value2[1]);
+//
+//                    String value3[]=info.split(" ")[5].split("TAKA");
+//                    //System.out.println(value3[0]);
+//
+//                    String str="Transaction No: "+value2[0]+"\nRecharge Amount: "+value3[0]+" Tk";
+
+
+                    arrayAdapter.add(info);
                 }
 
             } while (smsInboxCursor.moveToNext());
         }
+
+
+
+    public void refreshSmsInboxFull() {
+        ContentResolver contentResolver = getContentResolver();
+        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        int indexBody = smsInboxCursor.getColumnIndex("body");
+        int indexAddress = smsInboxCursor.getColumnIndex("address");
+        int date = smsInboxCursor.getColumnIndex("date");
+        if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
+        arrayAdapter.clear();
+        do {
+            String number=smsInboxCursor.getString(indexAddress);
+            String getDate=millisToDate(date);
+
+//                String FormattedDate;
+//
+//                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd-MM-yyyy",Locale.US);
+//                FormattedDate = sdf.format(getDate);
+
+                /*
+                1. Check specific number is matched or not
+
+                2. If need to show all sms removed condition
+                 */
+            if(number.equals("8383")) {
+
+                String info =smsInboxCursor.getString(indexBody);
+                Log.d("SMS",info);
+
+
+                String value2[]=info.split(" ")[2].split("to");
+                // System.out.println(value2[0]);
+                //System.out.println(value2[1]);
+
+                String value3[]=info.split(" ")[5].split("TAKA");
+                //System.out.println(value3[0]);
+
+                String str="Transaction No: "+value2[0]+"\nRecharge Amount: "+value3[0]+" Tk";
+
+
+                arrayAdapter.add(str);
+            }
+
+        } while (smsInboxCursor.moveToNext());
+    }
+
+
+    public static String millisToDate(long currentTime) {
+        String finalDate;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(currentTime);
+        Date date = calendar.getTime();
+        finalDate = date.toString();
+        return finalDate;
+    }
 
         public void updateList(final String smsMessage) {
             arrayAdapter.insert(smsMessage, 0);
